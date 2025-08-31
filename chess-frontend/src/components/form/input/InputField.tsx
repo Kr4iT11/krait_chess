@@ -22,7 +22,7 @@ interface InputProps {
 }
 
 const InputField: FC<InputProps> = ({
-    type = "text",
+    type = "",
     id,
     name,
     placeholder,

@@ -50,7 +50,7 @@ export class AuthController {
         this.setRefreshTokenCookie(res, data.refreshToken);
         return { accessToken: data.accessToken, user: data.user };
     }
-    @UseGuards(JwtAuthGuard)
+    // @UseGuards(JwtAuthGuard)
     @Post('logout')
     @ApiOperation({ summary: 'this is used for logout' })
     @ApiResponse({ status: 200, description: 'User Successfully logged out.' })

@@ -4,10 +4,10 @@ import Button from "../../components/ui/Button";
 import { useForm } from "react-hook-form";
 import { signInSchema, type TSignInSchema } from "../../lib/validators/authvalidations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLogin } from "../../features/authentication/hooks/useAuth";
+import { useAuth } from "../../features/authentication/context/AuthContext";
 
 const SignInForm: React.FC = () => {
-    const { mutate: login, isPending } = useLogin();
+    const { signin, signinPending } = useAuth();
     const {
         register,
         handleSubmit,
@@ -21,7 +21,7 @@ const SignInForm: React.FC = () => {
         console.log(data);
         // Need  to make API call here
         try {
-            login(data);
+            signin(data);
         } catch (error) {
             console.error('Sign in failed:', error);
         }
@@ -35,11 +35,11 @@ const SignInForm: React.FC = () => {
             <form onSubmit={handleSubmit(onSubmit)} >
                 <div className="mb-4">
                     <InputField
-                        id="username"
-                        type="text"
+                        id="email"
+                        type="email"
                         placeholder="ChessMaster123"
-                        register={register('username')}
-                        error={errors.username?.message}
+                        register={register('email')}
+                        error={errors.email?.message}
                     />
                 </div>
                 <div className="mb-4">
@@ -56,7 +56,7 @@ const SignInForm: React.FC = () => {
                     disabled={isSubmitting}
                     className="w-full mt-4 bg-yellow-500 ..."
                 >
-                    {isPending ? 'Signing In...' : 'Sign In'}
+                    {signinPending ? 'Signing In...' : 'Sign In'}
                 </Button>
             </form>
         </div>

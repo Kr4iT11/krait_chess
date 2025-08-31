@@ -1,18 +1,14 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useUser } from "../hooks/useAuth"
+import { useAuth } from "../context/AuthContext";
 
+export default function ProtectedRoute() {
+    const { user } = useAuth();
 
-
-const ProtectedRoute: React.FC = () => {
-    const { data: user, isLoading, isError } = useUser();
-    if (isLoading) {
-        return <div>Authenticating...</div>; // Or a full-page loader
+    // If no user is loaded, redirect to signin
+    if (!user) {
+        return <Navigate to="/signin" replace />;
     }
-    // If there's an error fetching the user, it means they are not authenticated
-    if (isError || !user) {
-        return <Navigate to="/signin" />;
-    }
-    return <Outlet />; // Render the child route (e.g., Dashboard)
+
+    // Otherwise, render children (protected pages)
+    return <Outlet />;
 }
-
-export default ProtectedRoute;

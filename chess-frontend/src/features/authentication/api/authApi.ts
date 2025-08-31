@@ -15,11 +15,15 @@ export const loginWithCredentials = async (credentials: TSignInSchema): Promise<
 // export const fetchUserProfile = async (credentials: TSignInSchema): Promise<User> =>
 //     await apiService.post(apiEndpoints.auth.getProfile, credentials);
 
-export const fetchUserProfile = async (credentials: TSignInSchema): Promise<User> =>
-    await apiService.post(apiEndpoints.auth.getProfile, credentials);
+// export const fetchUserProfile = async (credentials: TSignInSchema): Promise<User> =>
+//     await apiService.post(apiEndpoints.auth.getProfile, credentials);
 
-export const logoutUser = () =>
-    apiService.post(apiEndpoints.auth.logout, {});
+export const fetchUserProfile = async (): Promise<User> =>
+    apiService.get(apiEndpoints.auth.getProfile);
+
+export const logoutUser = async (): Promise<void> => {
+    await apiService.post(apiEndpoints.auth.logout, {});
+};
 
 export const registerUser = (data: TSignUpSchema): Promise<AuthResponse> =>
     apiService.post(apiEndpoints.auth.register, data);

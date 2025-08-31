@@ -4,10 +4,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { signUpSchema, type TSignUpSchema } from '../../lib/validators/authvalidations'; // Import our schema and type
 import InputField from '../form/input/InputField'; // Path might need adjustment
 import Button from '../ui/Button'; // Path might need adjustment
-import { useSignup } from '../../features/authentication/hooks/useAuth';
+import { useAuth } from '../../features/authentication/context/AuthContext';
 
 const SignupForm: React.FC = () => {
-    const { mutate: signup, isPending } = useSignup();
+    const { signup, signupPending } = useAuth();
     const {
         register,
         handleSubmit,
@@ -71,7 +71,7 @@ const SignupForm: React.FC = () => {
                         disabled={isSubmitting} // Disable button during submission
                         className="w-full mt-4 bg-yellow-500 ..."
                     >
-                        {isPending ? 'Creating Account...' : 'Sign Up'}
+                        {signupPending ? 'Creating Account...' : 'Sign Up'}
                     </Button>
                 </form>
             </div>

@@ -1,16 +1,8 @@
-import React from 'react';
-import { useLogout, useUser } from '../authentication/hooks/useAuth';
+import { useAuth } from '../authentication/context/AuthContext';
 
 const Dashboard = () => {
     // Get the current user's data from the cache
-    const { data: user } = useUser();
-
-    // Get the logout function from our mutation hook
-    const { mutate: logout } = useLogout();
-
-    const handleLogout = () => {
-        logout();
-    };
+    const { user, signout } = useAuth();
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
@@ -18,9 +10,9 @@ const Dashboard = () => {
                 <h1 className="text-3xl font-bold mb-4">
                     {/* Welcome, <span className="text-yellow-400">{user?.username || 'Player'}</span>! */}
                 </h1>
-                <p className="text-gray-400 mb-6">You are now logged in.</p>
+                <p className="text-gray-400 mb-6">You are now logged in.Welcome {user?.username}</p>
                 <button
-                    onClick={handleLogout}
+                    onClick={signout}
                     className="px-6 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-semibold transition-colors"
                 >
                     Logout

@@ -16,7 +16,8 @@ export const signUpSchema = z.object({
 
 export const signInSchema = z.object({
     // You might want to allow login with email or username. For now, let's use username.
-    username: z.string().min(1, { message: 'Username is required.' }),
+    // username: z.string().min(1, { message: 'Username is required.' }),
+    email: z.string().email("Invalid email address"),
     password: z.string().min(1, { message: 'Password is required.' })
 })
 
