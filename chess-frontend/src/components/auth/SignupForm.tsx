@@ -4,8 +4,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { signUpSchema, type TSignUpSchema } from '../../lib/validators/authvalidations'; // Import our schema and type
 import InputField from '../form/input/InputField'; // Path might need adjustment
 import Button from '../ui/Button'; // Path might need adjustment
+import { useSignup } from '../../features/authentication/hooks/useAuth';
 
 const SignupForm: React.FC = () => {
+    const { mutate: signup, isPending } = useSignup();
     const {
         register,
         handleSubmit,
@@ -20,9 +22,7 @@ const SignupForm: React.FC = () => {
         // Here you would make your API call
         console.log('Form submitted with data:', data);
         try {
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-            // Simulate successful signup
-            console.log('User signed up successfully:', data);
+            signup(data);
         } catch (error) {
             console.error('Signup failed:', error);
             // TODO: Handle error (e.g., show an error message to the user)
@@ -71,7 +71,7 @@ const SignupForm: React.FC = () => {
                         disabled={isSubmitting} // Disable button during submission
                         className="w-full mt-4 bg-yellow-500 ..."
                     >
-                        {isSubmitting ? 'Creating Account...' : 'Sign Up'}
+                        {isPending ? 'Creating Account...' : 'Sign Up'}
                     </Button>
                 </form>
             </div>

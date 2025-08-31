@@ -9,13 +9,13 @@ interface InputProps {
     placeholder?: string;
     value?: string | number;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    className?: string;
+    // className?: string;
     min?: string;
     max?: string;
     step?: number;
     disabled?: boolean;
-    success?: boolean;
-    hint?: string;
+    // success?: boolean;
+    // hint?: string;
     register?: UseFormRegisterReturn
     error?: string | undefined;
 
@@ -28,15 +28,15 @@ const InputField: FC<InputProps> = ({
     placeholder,
     value,
     onChange,
-    className = "",
+    // className = "",
     min,
     max,
     step,
     disabled = false,
-    hint,
+    // hint,
     register,
     error,
-    success
+    // success
 
 }) => {
     // for now lets comment this out and check if its working or not 

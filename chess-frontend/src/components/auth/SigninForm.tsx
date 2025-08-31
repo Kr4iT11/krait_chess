@@ -4,8 +4,10 @@ import Button from "../../components/ui/Button";
 import { useForm } from "react-hook-form";
 import { signInSchema, type TSignInSchema } from "../../lib/validators/authvalidations";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useLogin } from "../../features/authentication/hooks/useAuth";
 
 const SignInForm: React.FC = () => {
+    const { mutate: login, isPending } = useLogin();
     const {
         register,
         handleSubmit,
@@ -19,8 +21,7 @@ const SignInForm: React.FC = () => {
         console.log(data);
         // Need  to make API call here
         try {
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-            console.log('User signed in successfully:', data);
+            login(data);
         } catch (error) {
             console.error('Sign in failed:', error);
         }
@@ -55,7 +56,7 @@ const SignInForm: React.FC = () => {
                     disabled={isSubmitting}
                     className="w-full mt-4 bg-yellow-500 ..."
                 >
-                    {isSubmitting ? 'Signing In...' : 'Sign In'}
+                    {isPending ? 'Signing In...' : 'Sign In'}
                 </Button>
             </form>
         </div>
