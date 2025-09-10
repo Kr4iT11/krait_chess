@@ -1,5 +1,5 @@
 import { apiEndpoints } from "../../../config/apiEndpoints";
-import type { TSignInSchema, TSignUpSchema } from "../../../lib/validators/authvalidations";
+// import type { TSignInSchema, TSignUpSchema } from "../../../lib/validators/authvalidations";
 import { apiService } from "../../../service/apiService";
 import type { User } from "../../../types/User";
 
@@ -9,21 +9,18 @@ export interface AuthResponse {
     user: User
 }
 
-export const loginWithCredentials = async (credentials: TSignInSchema): Promise<AuthResponse> =>
-    await apiService.post(apiEndpoints.auth.login, credentials);
+export const loginWithCredentials = async (credentials: { username?: string; email?: string; password: string; }): Promise<AuthResponse> =>
+    await apiService.post<AuthResponse>(apiEndpoints.auth.login, credentials);
 
-// export const fetchUserProfile = async (credentials: TSignInSchema): Promise<User> =>
-//     await apiService.post(apiEndpoints.auth.getProfile, credentials);
 
-// export const fetchUserProfile = async (credentials: TSignInSchema): Promise<User> =>
-//     await apiService.post(apiEndpoints.auth.getProfile, credentials);
+export const registerUser = async (payload: { username: string; email?: string; password: string; }) =>
+    await apiService.post<AuthResponse>(apiEndpoints.auth.register, payload);
 
 export const fetchUserProfile = async (): Promise<User> =>
-    apiService.get(apiEndpoints.auth.getProfile);
+    await apiService.get<User>(apiEndpoints.auth.getProfile);
 
-export const logoutUser = async (): Promise<void> => {
-    await apiService.post(apiEndpoints.auth.logout, {});
-};
+export const refreshToken = async (): Promise<{ accessToken: string }> =>
+    await apiService.post(apiEndpoints.auth.refresh);
 
-export const registerUser = (data: TSignUpSchema): Promise<AuthResponse> =>
-    apiService.post(apiEndpoints.auth.register, data);
+export const logoutUser = async (): Promise<{ ok: boolean }> =>
+    await apiService.post(apiEndpoints.auth.logout);

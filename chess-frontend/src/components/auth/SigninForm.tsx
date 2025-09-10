@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "../../features/authentication/context/AuthContext";
 
 const SignInForm: React.FC = () => {
-    const { signin, signinPending } = useAuth();
+    const { login, signInPending } = useAuth();
     const {
         register,
         handleSubmit,
@@ -21,7 +21,7 @@ const SignInForm: React.FC = () => {
         console.log(data);
         // Need  to make API call here
         try {
-            signin(data);
+            login({ username: '', email: data.email, password: data.password }); // we are leaving username empty as backend accepts either username or email
         } catch (error) {
             console.error('Sign in failed:', error);
         }
@@ -56,7 +56,7 @@ const SignInForm: React.FC = () => {
                     disabled={isSubmitting}
                     className="w-full mt-4 bg-yellow-500 ..."
                 >
-                    {signinPending ? 'Signing In...' : 'Sign In'}
+                    {signInPending ? 'Signing In...' : 'Sign In'}
                 </Button>
             </form>
         </div>

@@ -7,7 +7,7 @@ import Button from '../ui/Button'; // Path might need adjustment
 import { useAuth } from '../../features/authentication/context/AuthContext';
 
 const SignupForm: React.FC = () => {
-    const { signup, signupPending } = useAuth();
+    const { registerLocal, signUpPending } = useAuth();
     const {
         register,
         handleSubmit,
@@ -22,7 +22,7 @@ const SignupForm: React.FC = () => {
         // Here you would make your API call
         console.log('Form submitted with data:', data);
         try {
-            signup(data);
+            registerLocal({ username: data.username, email: data.email, password: data.password });
         } catch (error) {
             console.error('Signup failed:', error);
             // TODO: Handle error (e.g., show an error message to the user)
@@ -71,7 +71,7 @@ const SignupForm: React.FC = () => {
                         disabled={isSubmitting} // Disable button during submission
                         className="w-full mt-4 bg-yellow-500 ..."
                     >
-                        {signupPending ? 'Creating Account...' : 'Sign Up'}
+                        {signUpPending ? 'Creating Account...' : 'Sign Up'}
                     </Button>
                 </form>
             </div>

@@ -1,143 +1,178 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createContext, useContext, useEffect, useState } from "react";
-import { setOnTokenRefreshed } from "../../../lib/interceptors";
-import {
-    fetchUserProfile,
-    loginWithCredentials,
-    logoutUser,
-    registerUser,
-    type AuthResponse,
-} from "../api/authApi";
-import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
-import { apiService } from "../../../service/apiService";
-import { apiEndpoints } from "../../../config/apiEndpoints";
+// src/features/authentication/context/AuthContext.tsx
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+
+
+import { useQueryClient } from '@tanstack/react-query';
+import { loginWithCredentials, fetchUserProfile, registerUser, logoutUser } from '../api/authApi';
+import { setOnTokenRefreshed, setAccessToken as setTokenInInterceptor } from '../../../lib/interceptors';
+import { apiService } from '../../../service/apiService';
+import { apiEndpoints } from '../../../config/apiEndpoints';
+import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+
+// import { set } from 'zod';
+
+type User = any;
 
 interface AuthContextType {
-    user: any;
-    accessToken: string | null;
-    signin: (credentials: any) => Promise<AuthResponse>;
-    signup: (data: any) => Promise<AuthResponse>;
-    signout: () => Promise<void>;
-    isInitializing: boolean;
-    signinPending: boolean;
-    signupPending: boolean;
+    user: User | null;
+    initializing: boolean;
+    login: (payload: { username?: string; email?: string; password: string }) => Promise<void>;
+    registerLocal: (payload: { username: string; email?: string; password: string }) => Promise<void>;
+    logout: () => Promise<void>;
+    isAuthenticated: boolean;
+    signInPending?: boolean;
+    signUpPending?: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const queryClient = useQueryClient();
-    const [accessToken, setAccessToken] = useState<string | null>(null);
-    const [isInitializing, setIsInitializing] = useState(true);
+export function AuthProvider({ children }: { children: ReactNode }) {
+    const [user, setUser] = useState<User | null>(null);
+    const [initializing, setInitializing] = useState(true);
+    const qc = useQueryClient();
     const navigate = useNavigate();
+    const [signInPending, setSignInPending] = useState(false);
+    const [signUpPending, setSignUpPending] = useState(false);
 
-    // 🔄 Restore session on app load
+    // subscribe to interceptor token events
     useEffect(() => {
-        const restoreSession = async () => {
+
+        setOnTokenRefreshed((token) => {
+            // if token === null => logout forced (refresh failed or reuse detected)
+            if (!token) {
+                setUser(null);
+                qc.clear(); // optionally clear cached queries
+                navigate('/signin');
+            }
+        });
+    }, [navigate, qc]);
+
+
+    // Try restore session on mount:
+    useEffect(() => {
+        let mounted = true;
+        // if (["/signin", "/signup"].includes(location.pathname)) {
+        //     setInitializing(false);
+        //     return;
+        // }
+        const restore = async () => {
             try {
-                const { accessToken }: any = await apiService.post(apiEndpoints.auth.refresh, {});
-                if (accessToken) {
-                    setAccessToken(accessToken);
-                    await queryClient.prefetchQuery({
-                        queryKey: ["user"],
-                        queryFn: fetchUserProfile,
-                    });
+                const location = useLocation();
+                if (['/signin', '/signup'].includes(location.pathname)) {
+                    setInitializing(false);
+                    return;
                 }
-            } catch {
-                console.log("No active session found");
+                // Try fetch current user - server may accept access cookie or require refresh
+                const profile = await fetchUserProfile();
+                if (!mounted) return;
+                setUser(profile);
+            } catch (err: any) {
+                // If 401, try to refresh (backend will rotate token and set cookies)
+                try {
+                    const resp = await apiService.post<{ accessToken: string }>(apiEndpoints.auth.refresh);
+                    const newAccess = resp?.accessToken;
+                    if (newAccess) {
+                        setTokenInInterceptor(newAccess);
+                        // refetch profile
+                        const profile = await fetchUserProfile();
+                        if (!mounted) return;
+                        setUser(profile);
+                    } else {
+                        // no token -> not logged in
+                        setUser(null);
+                    }
+                } catch {
+                    setUser(null);
+                }
             } finally {
-                setIsInitializing(false);
+                if (mounted) setInitializing(false);
             }
         };
-        restoreSession();
-    }, [queryClient]);
 
-    // 🔄 Sync context with interceptor refresh
-    useEffect(() => {
-        setOnTokenRefreshed((token) => {
-            setAccessToken(token);
-            if (!token) queryClient.removeQueries({ queryKey: ["user"] });
-        });
-    }, [queryClient]);
+        restore();
 
-    // Query for current user (enabled only if token exists)
-    const { data: user } = useQuery({
-        queryKey: ["user"],
-        queryFn: fetchUserProfile,
-        enabled: !!accessToken,
-    });
+        return () => { mounted = false; };
+    }, [qc]);
 
-    // 🔑 Mutations
-    const signinMutation = useMutation<AuthResponse, any, any>({
-        mutationFn: loginWithCredentials,
-        onSuccess: (data) => {
-            setAccessToken(data.accessToken);
-            queryClient.setQueryData(["user"], data.user);
-            toast.success("Welcome back!");
+    // login
+    const login = async (payload: { username?: string; email?: string; password: string }) => {
+        setSignInPending(true);
+        try {
+            console.log('login payload', payload);
+            const res = await loginWithCredentials(payload);
+            // server returns accessToken in body and sets refresh cookie
+            if (res?.accessToken) {
+                setTokenInInterceptor(res.accessToken);
+            }
+            setUser(res.user);
+            // Optional: prime react-query user cache
+            qc.setQueryData(['user'], res.user);
             navigate("/dashboard");
-        },
-        onError: (error: any) => {
-            toast.error(error.response?.data?.message || "Login failed.");
-        },
-    });
+        } catch (error) {
+            // on error, ensure no stale data
+            console.log('login error', error);
+            setSignInPending(false);
+            setUser(null);
+            qc.clear();
+            throw error;
+        }
+        finally {
+            setSignInPending(false);
+        }
 
-    const signupMutation = useMutation<AuthResponse, any, any>({
-        mutationFn: registerUser,
-        onSuccess: (data) => {
-            setAccessToken(data.accessToken);
-            queryClient.setQueryData(["user"], data.user);
-            toast.success("Account created successfully!");
-            navigate("/dashboard");
-        },
-        onError: (error: any) => {
-            toast.error(error.response?.data?.message || "Registration failed.");
-        },
-    });
+    };
 
-    const logoutMutation = useMutation<void, any, void>({
-        mutationFn: async () => {
+    const registerLocal = async (payload: { username: string; email?: string; password: string }) => {
+        try {
+            setSignUpPending(true);
+            const res = await registerUser(payload);
+            if (res?.accessToken) setTokenInInterceptor(res.accessToken);
+            setUser(res.user);
+            qc.setQueryData(['user'], res.user);
+            navigate('/signin');
+        } catch (error) {
+            console.log('registration error', error);
+            setSignInPending(false);
+            setUser(null);
+            qc.clear();
+            throw error;
+        }
+        finally {
+            setSignUpPending(false);
+        }
+    };
+
+    const logout = async () => {
+        try {
             await logoutUser();
-        },
-        onSuccess: () => {
-            setAccessToken(null); // This is wrong we need to reimplement this and figure it out 
-            queryClient.removeQueries({ queryKey: ["user"] });
-            toast.success("Logged out successfully.");
-            navigate("/signin");
-        },
-        onError: () => {
-            // Even if backend 401s, clear client state
-            setAccessToken(null);
-            queryClient.removeQueries({ queryKey: ["user"] });
-            navigate("/signin");
-        },
-    });
+            navigate('/signin');
+        } catch {
+            // ignore network errors, still clear client-side state
+        } finally {
+            setTokenInInterceptor(null);
+            setUser(null);
+            qc.clear();
+            navigate('/signin');
+        }
+    };
 
-    // Exposed methods
-    const signin = (credentials: any) => signinMutation.mutateAsync(credentials);
-    const signup = (data: any) => signupMutation.mutateAsync(data);
-    const signout = () => logoutMutation.mutateAsync();
+    const value: AuthContextType = {
+        user,
+        initializing,
+        login,
+        registerLocal,
+        logout,
+        isAuthenticated: !!user,
+        signInPending,
+        signUpPending,
+    };
 
-    return (
-        <AuthContext.Provider
-            value={{
-                user,
-                accessToken,
-                signin,
-                signup,
-                signout,
-                isInitializing,
-                signinPending: signinMutation.isPending,
-                signupPending: signupMutation.isPending,
-            }}
-        >
-            {children}
-        </AuthContext.Provider>
-    );
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
     const ctx = useContext(AuthContext);
-    if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+    if (!ctx) throw new Error('useAuth must be used within AuthProvider');
     return ctx;
 }
