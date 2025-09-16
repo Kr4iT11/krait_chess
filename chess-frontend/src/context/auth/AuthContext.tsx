@@ -3,10 +3,10 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 
 
 import { useQueryClient } from '@tanstack/react-query';
-import { loginWithCredentials, fetchUserProfile, registerUser, logoutUser } from '../api/authApi';
-import { setOnTokenRefreshed, setAccessToken as setTokenInInterceptor } from '../../../lib/interceptors';
-import { apiService } from '../../../service/apiService';
-import { apiEndpoints } from '../../../config/apiEndpoints';
+import { loginWithCredentials, fetchUserProfile, registerUser, logoutUser } from '../../features/authentication/api/authApi';
+import { setOnTokenRefreshed, setAccessToken as setTokenInInterceptor } from '../../lib/interceptors';
+import { apiService } from '../../service/apiService';
+import { apiEndpoints } from '../../config/apiEndpoints';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 

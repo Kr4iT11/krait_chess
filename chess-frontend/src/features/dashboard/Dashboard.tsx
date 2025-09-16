@@ -1,4 +1,4 @@
-import { useAuth } from '../authentication/context/AuthContext';
+import { useAuth } from '../../context/auth/AuthContext';
 
 const Dashboard = () => {
     // Get the current user's data from the cache

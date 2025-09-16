@@ -4,7 +4,7 @@ import Button from "../../components/ui/Button";
 import { useForm } from "react-hook-form";
 import { signInSchema, type TSignInSchema } from "../../lib/validators/authvalidations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from "../../features/authentication/context/AuthContext";
+import { useAuth } from "../../context/auth/AuthContext";
 
 const SignInForm: React.FC = () => {
     const { login, signInPending } = useAuth();

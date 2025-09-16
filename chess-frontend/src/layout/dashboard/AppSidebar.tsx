@@ -15,7 +15,7 @@ import { Link, useLocation } from "react-router";
 //   TableIcon,
 //   UserCircleIcon,
 // } from "../../icons";
-import { useSidebar } from "../../context/SidebarContext";
+import { useSidebar } from "../../context/layout/SidebarContext";
 import { ChevronDownIcon, GridIcon, ListIcon, PieChartIcon, TableIcon, UserCircleIcon, } from "lucide-react";
 import { BoxCubeIcon, CalenderIcon, HorizontaLDots, PageIcon, PlugInIcon } from "../../icons";
 import SidebarWidget from "./SidebarWidget";

@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { signUpSchema, type TSignUpSchema } from '../../lib/validators/authvalidations'; // Import our schema and type
 import InputField from '../form/input/InputField'; // Path might need adjustment
 import Button from '../ui/Button'; // Path might need adjustment
-import { useAuth } from '../../features/authentication/context/AuthContext';
+import { useAuth } from '../../context/auth/AuthContext';
 
 const SignupForm: React.FC = () => {
     const { registerLocal, signUpPending } = useAuth();
