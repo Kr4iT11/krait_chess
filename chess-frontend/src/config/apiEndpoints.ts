@@ -6,5 +6,10 @@ export const apiEndpoints = {
         refresh: '/auth/refresh',
         getProfile: '/users/me',
         logout: '/auth/logout'
+    },
+    realtime: {
+        notifications: '/realtime/notifications',
+        markread: '/realtime/mark-read'
+
     }
 }

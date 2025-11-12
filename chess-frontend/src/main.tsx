@@ -7,6 +7,7 @@ import { AuthProvider } from './context/auth/AuthContext.tsx';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from './context/layout/ThemeContext.tsx';
 import { ScrollToTop } from './components/common/ScrollToTop.tsx';
+import { NotificationProvider } from './notifications/NotificationContext.ts';
 const queryClient = new QueryClient();
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -14,9 +15,11 @@ createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <ScrollToTop />
         <AuthProvider>
-          <ThemeProvider>
-            <App />
-          </ThemeProvider>
+          <NotificationProvider>
+            <ThemeProvider>
+              <App />
+            </ThemeProvider>
+          </NotificationProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>

@@ -18,7 +18,7 @@ export const initialState: State = {
 
 export type Action =
     | { type: 'INIT', items: AppNotification[] } // seed items (from localStorage or initial fetch)
-    | { type: 'ADD_PAGE', item: AppNotification, page: number } // add a page of items (from fetch)
+    | { type: 'ADD_PAGE', items: AppNotification[], page: number } // add a page of items (from fetch)
     | { type: 'NEW', item: AppNotification } // add a new item (from websocket)
     | { type: 'UPDATE'; id: string; patch: Partial<AppNotification> } // update an item (e.g. mark as read)
     | { type: 'MARK_ALL_READ' }                                 // mark all read locally
@@ -58,7 +58,7 @@ export function reducer(state: State, action: Action): State {
             return { ...state, items: action.items, unreadCount: unread };
         }
         case 'ADD_PAGE': {
-            const items = dedupeAndMerge(state.items, [action.item]);
+            const items = dedupeAndMerge(state.items, [action.items].flat());
             const unread = items.filter(x => !x.isRead).length;
             return { ...state, items: items, page: action.page, unreadCount: unread, loading: false };
         }
