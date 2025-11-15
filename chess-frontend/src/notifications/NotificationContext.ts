@@ -60,6 +60,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             bcRef.current?.postMessage({ type: 'INIT_STATE', payload: { items } });
         },
         onNew: (item: AppNotification) => {
+            console.log('[socket] dispatching NEW notification', item);
             dispatch({ type: 'NEW', item });
             bcRef.current?.postMessage({ type: 'NEW', payload: item });
         },

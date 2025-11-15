@@ -25,7 +25,9 @@ export function useSocket(handlers: SocketHandlers) {
 
         // notification events
         socket.on('notifications:initial', (items: AppNotification[]) => handlers.onInitial(items));
-        socket.on('notifications:new', (item: AppNotification) => handlers.onNew(item));
+        socket.on('notifications:new', (n) => {
+            console.log('[socket] received notifications:new', n); handlers.onNew?.(n);
+        });
         socket.on('notifications:update', (id: string, patch: Partial<AppNotification>) => handlers.onUpdate(id, patch));
         socket.on('notifications:all_read', () => handlers.onAllRead());
 

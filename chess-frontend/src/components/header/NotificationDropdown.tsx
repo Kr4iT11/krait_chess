@@ -12,8 +12,11 @@ export default function NotificationDropdown() {
 
 
   useEffect(() => {
-    console.log(fetchPage(1));
-    fetchPage(1);
+    async function load() {
+      // console.log(await fetchPage(1));
+      await fetchPage(1);
+    }
+    load();
   }, []);
 
 
@@ -88,7 +91,7 @@ export default function NotificationDropdown() {
         <ul className="flex flex-col h-auto overflow-y-auto custom-scrollbar">
           {/* Example notification items */}
           {notifications.map((notification) => (
-            <li>
+            <li key={notification.id}>
               <DropdownItem
                 className="flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5"
               >
