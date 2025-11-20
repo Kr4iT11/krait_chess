@@ -1,16 +1,16 @@
-import { useAuth } from '../../context/auth/AuthContext';
+// import { useAuth } from '../../context/auth/AuthContext';
 
 const Dashboard = () => {
     // Get the current user's data from the cache
-    const { user, logout } = useAuth();
+    // const { user, logout } = useAuth();
 
     return (
         <>
-            <div className="grid grid-cols-12 gap-4 md:gap-6">
+            {/* <div className="grid grid-cols-12 gap-4 md:gap-6">
                 <div>
                     <div>
                         <h1 className="text-3xl font-bold mb-4">
-                            {/* Welcome, <span className="text-yellow-400">{user?.username || 'Player'}</span>! */}
+                            
                         </h1>
                         <p className="text-gray-400 mb-6">You are now logged in.Welcome {user?.username}</p>
                         <button
@@ -21,7 +21,7 @@ const Dashboard = () => {
                         </button>
                     </div>
                 </div>
-            </div>
+            </div> */}
         </>
 
     );
