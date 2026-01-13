@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 
 import { useQueryClient } from '@tanstack/react-query';
 import { loginWithCredentials, fetchUserProfile, registerUser, logoutUser } from '../../features/authentication/api/authApi';
-import { setOnTokenRefreshed, setAccessToken as setTokenInInterceptor } from '../../lib/interceptors';
+import { setOnTokenRefreshed, setAccessToken as setTokenInInterceptor } from '../../lib/auth.interceptor';
 import { apiService } from '../../service/apiService';
 import { apiEndpoints } from '../../config/apiEndpoints';
 import { useNavigate } from 'react-router-dom';
@@ -102,9 +102,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.log('login payload', payload);
             const res = await loginWithCredentials(payload);
             // server returns accessToken in body and sets refresh cookie
-            if (res?.accessToken) {
+            if (res.accessToken) {
                 setTokenInInterceptor(res.accessToken);
             }
+            console.log('login response', res);
             setUser(res.user);
             // Optional: prime react-query user cache
             qc.setQueryData(['user'], res.user);

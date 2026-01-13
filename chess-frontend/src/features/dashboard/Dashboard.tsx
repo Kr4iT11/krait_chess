@@ -1,9 +1,11 @@
 // import { useAuth } from '../../context/auth/AuthContext';
 
+import Button from "../../components/ui/Button";
+
 const Dashboard = () => {
     // Get the current user's data from the cache
     // const { user, logout } = useAuth();
-
+   
     return (
         <>
             {/* <div className="grid grid-cols-12 gap-4 md:gap-6">
@@ -22,6 +24,7 @@ const Dashboard = () => {
                     </div>
                 </div>
             </div> */}
+        <Button variant="primary">Play</Button>
         </>
 
     );
