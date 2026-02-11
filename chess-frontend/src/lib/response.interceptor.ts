@@ -1,24 +1,35 @@
-import { api } from './api';
+// src/lib/interceptors/responseInterceptor.ts
+
+import type { ApiError, ApiResponse } from "../types/ApiResponseType";
+import api from "./api";
+
 
 api.interceptors.response.use(
     (res) => {
-        const apiResponse = res.data;
+        const apiResponse = res.data as ApiResponse<any>;
+
+        // ✅ success path
         if (apiResponse?.meta?.status === 'success') {
-            return apiResponse;
+            return apiResponse.data;
         }
-        return Promise.reject({
-            message: apiResponse?.meta?.message || 'Unknown API error',
-            status: apiResponse?.meta?.status || 'error',
+
+        // ❌ API-level failure
+        throw {
+            message: apiResponse?.meta?.message || 'API Error',
+            status: apiResponse?.meta?.httpStatus,
             meta: apiResponse?.meta,
             error: apiResponse?.error,
-        });
+        } as ApiError;
     },
     (error) => {
-        // Network / timeout / server crash
-        return Promise.reject({
-            message: error.message || "Network error",
+        // ❌ network / timeout / 5xx
+        throw {
+            message:
+                error.response?.data?.meta?.message ||
+                error.message ||
+                'Network error',
             status: error.response?.status,
-            raw: error
-        });
+            error,
+        } as ApiError;
     }
 );

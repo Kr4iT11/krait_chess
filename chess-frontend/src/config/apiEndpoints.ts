@@ -10,6 +10,9 @@ export const apiEndpoints = {
     realtime: {
         notifications: '/realtime/notifications',
         markread: '/realtime/mark-read'
-
+    },
+    games: {
+        create: '/games/create',
+        join: '/games/join',
     }
 }

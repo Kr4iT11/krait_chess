@@ -1,4 +1,5 @@
 import { api } from '../lib/api';
+import type { ApiResponse } from '../types/ApiResponseType';
 
 /**
  * A centralized API service that provides clean methods for all HTTP requests.
@@ -13,9 +14,9 @@ export const apiService = {
    * @param params An optional object of URL query parameters.
    * @returns The `data` property of the API response.
    */
-    get: async <T = any>(endpoint: string, params?: object): Promise<T> => {
-        const res = await api.get<T>(endpoint, { params });
-        return res.data;
+    get: async <T>(url: string, params?: object): Promise<T> => {
+        const res = await api.get<T>(url, { params });
+        return res as unknown as T;
     },
 
     /**
@@ -24,9 +25,9 @@ export const apiService = {
      * @param body The request body.
      * @returns The `data` property of the API response.
     */
-    post: async <T = any>(endpoint: string, body?: object): Promise<T> => {
-        const res = await api.post<T>(endpoint, body);
-        return res.data;
+    post: async <T>(url: string, body?: object): Promise<T> => {
+        const res = await api.post<T>(url, body);
+        return res as unknown as T;
     },
 
     /**
@@ -35,20 +36,19 @@ export const apiService = {
     * @param body The request body.
     * @returns The `data` property of the API response.
     */
-    put: async <T = any>(endpoint: string, body?: object): Promise<T> => {
-        const res = await api.put<T>(endpoint, body);
-        return res.data;
+    put: async <T>(url: string, body?: object): Promise<T> => {
+        const res = await api.put<T>(url, body);
+        return res as unknown as T;
     },
-
     /**
   * Sends a PATCH request to the specified endpoint.
   * @param endpoint The API endpoint path.
   * @param body The request body.
   * @returns The `data` property of the API response.
   */
-    patch: async <T = any>(endpoint: string, body?: object): Promise<T> => {
-        const res = await api.patch<T>(endpoint, body);
-        return res.data;
+    patch: async <T>(url: string, body?: object): Promise<T> => {
+        const res = await api.patch<T>(url, body);
+        return res as unknown as T;
     },
 
     /**
@@ -56,9 +56,9 @@ export const apiService = {
      * @param endpoint The API endpoint path.
      * @returns The `data` property of the API response.
      */
-    delete: async <T = any>(endpoint: string): Promise<T> => {
-        const res = await api.delete<T>(endpoint);
-        return res.data;
+    delete: async <T>(url: string): Promise<T> => {
+        const res = await api.delete<T>(url);
+        return res as unknown as T;
     },
 
 }
