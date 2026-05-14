@@ -1,11 +1,13 @@
 // import { useAuth } from '../../context/auth/AuthContext';
-
 import Button from "../../shared/Button";
-import PlayChess from "../game/pages/LiveGamePage";
+import { useNavigate } from "react-router-dom";
 
-const Dashboard = () => {
+const DashboardPage = () => {
+    const navigate = useNavigate();
 
-
+    const handleStartGame = () => {
+        navigate("game");
+    } 
     return (
         <>
             <div className="grid grid-cols-12 gap-4 md:gap-6">
@@ -20,7 +22,7 @@ const Dashboard = () => {
                                 Start a Game
                             </h4>
 
-                            <Button
+                            <Button onClick={handleStartGame}
                                 type="submit"
                                 className="mt-4 bg-yellow-500 hover:bg-yellow-600 text-black"
                             >
@@ -31,10 +33,10 @@ const Dashboard = () => {
                 </div>
 
                 {/* RIGHT CARD – Chess UI */}
-                <PlayChess />
+                {/* <LiveGamePage /> */}
             </div>
         </>
     );
 };
 
-export default Dashboard;
+export default DashboardPage;

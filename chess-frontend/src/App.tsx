@@ -1,12 +1,13 @@
 // src/App.tsx
 import './App.css';
 import { Route, Routes } from 'react-router-dom';
-import SignIn from './features/authentication/pages/Signin';
-import Signup from './features/authentication/pages/Signup';
 // import { Toaster } from 'react-hot-toast';
 import ProtectedRoute from './features/authentication/routes/ProtectedRoute';
-import Dashboard from './features/dashboard/Dashboard';
 import AppLayout from './layout/dashboard/AppLayout';
+import SignIn from './features/authentication/pages/SigninPage';
+import Signup from './features/authentication/pages/SignupPage';
+import DashboardPage from './features/dashboard/DashboardPage';
+import LiveGamePage from './features/game/pages/LiveGamePage';
 
 function App() {
   return (
@@ -31,7 +32,8 @@ function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/dashboard/game" element={<LiveGamePage />} />
           </Route>
         </Route>
 

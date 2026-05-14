@@ -1,6 +1,6 @@
 import { Chessboard } from 'react-chessboard';
 
-const ChessBoardView = ({
+const ChessBoard = ({
     position,
     onPieceDrop,
     boardOrientation = "white",
@@ -23,4 +23,4 @@ const ChessBoardView = ({
     );
 }
 
-export default ChessBoardView;
+export default ChessBoard;

@@ -2,7 +2,7 @@ export interface Game {
     id: string;
     uuid: string;
     variant: 'standard';
-    timeControl: 'unlimited';
+    timeControl: string | 'unlimited';
     status: 'created' | 'ongoing' | 'finished';
     result: 'ongoing' | 'white_win' | 'black_win' | 'draw';
     movesCount: number;

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Chess } from 'chess.js'
-import ChessBoardView from '../../../components/chessboard/chessboard';
+import ChessBoard from '../components/ChessBoard';
 
-const PlayChess: React.FC = () => {
+const LiveGamePage: React.FC = () => {
     const chessGameRef = useRef(new Chess());
     const chessGame = chessGameRef.current;
     const [chessPosition, setChessPosition] = useState(chessGame.fen());
@@ -21,7 +21,7 @@ const PlayChess: React.FC = () => {
                     {/* Load your chess UI here */}
                     {/* <ChessUI /> */}
                     <div className="flex items-center justify-center h-[930px] text-gray-400">
-                        <ChessBoardView
+                        <ChessBoard
                             position={chessPosition}
                             boardOrientation="white"
                             arePiecesDraggable={true}
@@ -32,4 +32,4 @@ const PlayChess: React.FC = () => {
         </>
     );
 };
-export default PlayChess;
+export default LiveGamePage;
