@@ -1,7 +1,7 @@
 // import { useAuth } from '../../context/auth/AuthContext';
 
 import Button from "../../shared/Button";
-import PlayChess from "../game/pages/LiveGamePage";
+import PlayChess from "../play/playchess";
 
 const Dashboard = () => {
 

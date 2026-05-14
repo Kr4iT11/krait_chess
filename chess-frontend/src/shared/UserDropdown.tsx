@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { DropdownItem } from "../dropdown/DropdownItem";
-import { Dropdown } from "../dropdown/Dropdown";
+import { DropdownItem } from "./DropdownItem";
+import { Dropdown } from "./Dropdown";
 import { Link } from "react-router";
-import { useAuth } from "../../context/auth/AuthContext";
+import { useAuth } from "../context/auth/AuthContext";
 
 export default function UserDropdown() {
     const [isOpen, setIsOpen] = useState(false);

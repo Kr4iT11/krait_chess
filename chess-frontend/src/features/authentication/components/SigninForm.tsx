@@ -1,10 +1,10 @@
 import React from "react";
-import InputField from "../../components/form/input/InputField";
-import Button from "../../components/ui/Button";
 import { useForm } from "react-hook-form";
-import { signInSchema, type TSignInSchema } from "../../lib/validators/authvalidations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from "../../context/auth/AuthContext";
+import { useAuth } from "../../../context/auth/AuthContext";
+import { signInSchema, type TSignInSchema } from "../../../lib/validators/authvalidations";
+import InputField from "../../../shared/InputField";
+import Button from "../../../shared/Button";
 
 const SignInForm: React.FC = () => {
     const { login, signInPending } = useAuth();

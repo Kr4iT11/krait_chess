@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/auth/AuthContext.tsx';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from './context/layout/ThemeContext.tsx';
-import { ScrollToTop } from './components/common/ScrollToTop.tsx';
+import { ScrollToTop } from './shared/ScrollToTop.tsx';
 import { NotificationProvider } from './notifications/NotificationContext.ts';
 import './lib/interceptors.ts';
 const queryClient = new QueryClient();

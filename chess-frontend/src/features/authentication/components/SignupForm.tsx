@@ -1,10 +1,10 @@
 import React from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signUpSchema, type TSignUpSchema } from '../../lib/validators/authvalidations'; // Import our schema and type
-import InputField from '../form/input/InputField'; // Path might need adjustment
-import Button from '../ui/Button'; // Path might need adjustment
-import { useAuth } from '../../context/auth/AuthContext';
+import { useAuth } from '../../../context/auth/AuthContext';
+import { signUpSchema, type TSignUpSchema } from '../../../lib/validators/authvalidations';
+import InputField from '../../../shared/InputField';
+import Button from '../../../shared/Button';
 
 const SignupForm: React.FC = () => {
     const { registerLocal, signUpPending } = useAuth();

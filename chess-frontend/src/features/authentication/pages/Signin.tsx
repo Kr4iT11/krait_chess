@@ -1,5 +1,5 @@
-import SignInForm from '../../components/auth/SigninForm';
-import AuthLayout from '../../layout/AuthLayout';
+import AuthLayout from '../../../layout/AuthLayout';
+import SignInForm from '../components/SigninForm';
 
 const SignIn: React.FC = () => {
   return (

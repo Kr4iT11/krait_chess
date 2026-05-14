@@ -23,7 +23,7 @@ export class GamesService {
       status: 'created', // default value when a game is created
       result: 'ongoing', // default value when a game is created
       movesCount: 0,
-      currentFen: createGameDto.current_fen,
+      currentFen: "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
       createdAt: new Date(),
       visibility: 'public', // default value when a game is created
       startedAt: null,

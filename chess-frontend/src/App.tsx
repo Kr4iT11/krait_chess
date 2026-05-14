@@ -1,8 +1,8 @@
 // src/App.tsx
 import './App.css';
 import { Route, Routes } from 'react-router-dom';
-import SignIn from './features/authentication/Signin';
-import Signup from './features/authentication/Signup';
+import SignIn from './features/authentication/pages/Signin';
+import Signup from './features/authentication/pages/Signup';
 // import { Toaster } from 'react-hot-toast';
 import ProtectedRoute from './features/authentication/routes/ProtectedRoute';
 import Dashboard from './features/dashboard/Dashboard';
