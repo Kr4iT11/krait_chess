@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { Game } from '../entities/Games';
 import { v4 as uuidv4 } from 'uuid';
 import { GamePlayer } from '../entities/GamePlayers';
-import { disconnect } from 'process';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class GamesService {
@@ -14,41 +14,63 @@ export class GamesService {
   constructor(
     @InjectRepository(Game) private gameRepository: Repository<Game>,
     @InjectRepository(GamePlayer) private gamePlayersRepository: Repository<GamePlayer>
+    , private dataSource: DataSource,
   ) { }
   async create(createGameDto: CreateGameDto) {
-    const newGame = this.gameRepository.create({
-      uuid: uuidv4(),
-      variant: createGameDto.variant, // for phase 1 only keep 'standard'
-      timeControl: createGameDto.timeControl, // for phase 1 only keep 'unlimited'
-      status: createGameDto.status, // default value when a game is created
-      result: createGameDto.result, // default value when a game is created
-      movesCount: createGameDto.moves_count | 0,
-      currentFen: createGameDto.current_fen,
-      createdAt: new Date(),
-      visibility: createGameDto.visiblity, // default value when a game is created
-      startedAt: null,
-      finishedAt: null,
-      terminationReason: null,
+    return await this.dataSource.transaction(async manager => {
+      // check if user already has an ongoing game
+      const existingPlayer = await manager
+        .getRepository(GamePlayer)
+        .createQueryBuilder('gp')
+        .setLock('pessimistic_write')
+        .where('gp.userId = :userId', {
+          userId: createGameDto.userId,
+        })
+        .andWhere('gp.result = :result', {
+          result: 'unknown',
+        })
+        .getOne();
+      // if on going game, return it;
+      if (existingPlayer) {
+        return await manager.getRepository(Game).findOne({
+          where: {
+            id: existingPlayer.gameId,
+          },
+        });
+      }
+
+      // save game
+      const game = manager.getRepository(Game).create({
+        uuid: uuidv4(),
+        variant: createGameDto.variant,
+        timeControl: createGameDto.timeControl,
+        status: createGameDto.status,
+        result: createGameDto.result,
+        movesCount: createGameDto.moves_count ?? 0,
+        currentFen: createGameDto.current_fen,
+        createdAt: new Date(),
+        visibility: createGameDto.visiblity,
+        startedAt: null,
+        finishedAt: null,
+        terminationReason: null,
+      });
+      const savedGame = await manager.getRepository(Game).save(game);
+
+      // save game player
+      const gamePlayer = manager.getRepository(GamePlayer).create({
+        gameId: savedGame.id,
+        userId: createGameDto.userId,
+        side: Math.random() < 0.5 ? 'white' : 'black', // randomly assign white or black
+        isWinner: false,
+        ratingBefore: null,
+        ratingAfter: null,
+        isBot: false,
+        disconnectedAt: null,
+        result: 'unknown',
+      });
+      await manager.getRepository(GamePlayer).save(gamePlayer);
+      return savedGame;
     });
-
-    const gameResult = await this.gameRepository.save(newGame);
-    if (!gameResult) {
-      throw new Error('Failed to create game');
-    }
-
-    const game_players = this.gamePlayersRepository.create({
-      userId: createGameDto.userId,
-      gameId: gameResult.id,
-      side: 'white', // for now lets keep it to white, in the future we can add a logic to assign colors
-      isWinner: false, // default value, will be updated at the end of the game
-      ratingBefore: null, // we can fetch the user's rating before the game starts and update it after the game ends
-      ratingAfter: null, // we can calculate the user's rating after the game ends and update it
-      isBot: false, // for now we are not supporting bots, but we can add a logic to assign bots in the future
-      disconnectedAt: null, // we can update this field when a player disconnects from the game
-      result: 'unknown', // default value, will be updated at the end of the game
-    })
-    await this.gamePlayersRepository.save(game_players);
-    return gameResult
   }
 
   findAll() {

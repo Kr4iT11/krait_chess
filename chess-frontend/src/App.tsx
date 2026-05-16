@@ -33,7 +33,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/dashboard/game" element={<LiveGamePage />} />
+            <Route path="/game/:gameId" element={<LiveGamePage />} />
           </Route>
         </Route>
 

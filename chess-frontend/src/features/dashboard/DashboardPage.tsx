@@ -1,13 +1,41 @@
 // import { useAuth } from '../../context/auth/AuthContext';
 import Button from "../../shared/Button";
 import { useNavigate } from "react-router-dom";
+import { createGame } from "../game/api/gameApi";
+import type { Game } from "../../types/Game";
+import { Chess } from 'chess.js'
+import { useRef, useState } from "react";
 
 const DashboardPage = () => {
+    const chessGameRef = useRef(new Chess());
+    const chessGame = chessGameRef.current;
+
     const navigate = useNavigate();
 
-    const handleStartGame = () => {
-        navigate("game");
-    } 
+    const handleStartGame = async () => {
+        try {
+            const payload: Game = {
+                variant: 'standard',
+                timeControl: 'unlimited',
+                status: 'created',
+                result: 'ongoing',
+                visiblity: 'public',
+                moves_count: 0,
+                current_fen: chessGame.fen(),
+            };
+            const response = await createGame(payload);
+            if (response) {
+                const gameId = response.uuid;
+                navigate(`/game/${gameId}`);
+            } else {
+                alert("Failed to start game. Please try again.");
+                throw new Error("Invalid response from server");
+            }
+        } catch (error) {
+            console.log("Error starting game:", error);
+            alert("Failed to start game. Please try again.");
+        }
+    };
     return (
         <>
             <div className="grid grid-cols-12 gap-4 md:gap-6">
