@@ -8,5 +8,4 @@ export interface User {
     isVerified: boolean;
     createdAt: string; // Dates are typically strings in JSON
     updatedAt: string;
-
 }

@@ -91,7 +91,7 @@ async function bootstrap() {
   // const wsAuth = new WsAuth(jwtService);
 
   const adapter = new IoAdapter(app);
-  app.useWebSocketAdapter(adapter);
+  app.useWebSocketAdapter(adapter as any);
   const server: any = (adapter as any).httpServer?.io ?? (adapter as any).httpServer;
   const io = server?.io ?? (app as any).getHttpServer()?.io ?? (adapter as any).getServer?.();
 

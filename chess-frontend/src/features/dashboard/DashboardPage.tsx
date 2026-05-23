@@ -19,7 +19,7 @@ const DashboardPage = () => {
                 timeControl: 'unlimited',
                 status: 'created',
                 result: 'ongoing',
-                visiblity: 'public',
+                visibility: 'public',
                 moves_count: 0,
                 current_fen: chessGame.fen(),
             };

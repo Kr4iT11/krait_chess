@@ -1,27 +1,32 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsEnum, IsInt, IsOptional, IsString, Min } from "class-validator";
 
-enum GameVariant {
+export enum GameVariant {
     STANDARD = 'standard',
 }
-enum TimeControl {
+export enum TimeControl {
     UNLIMITED = 'unlimited',
 }
-enum GameStatus {
+export enum GameStatus {
     CREATED = 'created',
     ONGOING = 'ongoing',
     FINISHED = 'finished',
     ABORTED = 'aborted',
 }
-enum GameResult {
+export enum GameResult {
     WHITE_WIN = 'white_win',
     BLACK_WIN = 'black_win',
     DRAW = 'draw',
     ONGOING = 'ongoing',
     ABORTED = 'aborted',
 }
-
-enum Visibility {
+export enum PlayerResult {
+    WIN = 'win',
+    LOSS = 'loss',
+    DRAW = 'draw',
+    UNKNOWN = 'unknown',
+}
+export enum Visibility {
     PUBLIC = 'public',
     PRIVATE = 'private',
 }
@@ -57,7 +62,7 @@ export class CreateGameDto {
     @IsString()
     @IsEnum(Visibility)
     @IsOptional()
-    visiblity?: Visibility;
+    visibility?: Visibility;
     @ApiPropertyOptional({ example: '', description: 'started at' })
     @IsOptional()
     started_at?: Date | null;

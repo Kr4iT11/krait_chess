@@ -13,6 +13,7 @@ export const apiEndpoints = {
     },
     games: {
         create: '/games/create',
-        join: '/games/join',
+        getByUuid: '/games/get-by-uuid',
+        move: '/games/move'
     }
 }

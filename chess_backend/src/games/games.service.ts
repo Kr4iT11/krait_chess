@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CreateGameDto } from './dto/create-game.dto';
+import { CreateGameDto, GameStatus, GameResult, PlayerResult } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -7,6 +7,8 @@ import { Game } from '../entities/Games';
 import { v4 as uuidv4 } from 'uuid';
 import { GamePlayer } from '../entities/GamePlayers';
 import { DataSource } from 'typeorm';
+import { MoveDto } from './dto/move.dto';
+import { Chess } from 'chess.js';
 
 @Injectable()
 export class GamesService {
@@ -19,7 +21,7 @@ export class GamesService {
   async create(createGameDto: CreateGameDto) {
     return await this.dataSource.transaction(async manager => {
       // check if user already has an ongoing game
-      const existingPlayer = await manager
+      const exsitingGame = await manager
         .getRepository(GamePlayer)
         .createQueryBuilder('gp')
         .setLock('pessimistic_write')
@@ -31,12 +33,8 @@ export class GamesService {
         })
         .getOne();
       // if on going game, return it;
-      if (existingPlayer) {
-        return await manager.getRepository(Game).findOne({
-          where: {
-            id: existingPlayer.gameId,
-          },
-        });
+      if (exsitingGame) {
+        return createGameDto.userId ? await this.getGameByUserId(createGameDto.userId) : null;
       }
 
       // save game
@@ -49,7 +47,7 @@ export class GamesService {
         movesCount: createGameDto.moves_count ?? 0,
         currentFen: createGameDto.current_fen,
         createdAt: new Date(),
-        visibility: createGameDto.visiblity,
+        visibility: createGameDto.visibility,
         startedAt: null,
         finishedAt: null,
         terminationReason: null,
@@ -69,7 +67,12 @@ export class GamesService {
         result: 'unknown',
       });
       await manager.getRepository(GamePlayer).save(gamePlayer);
-      return savedGame;
+      if (gamePlayer && createGameDto.userId) {
+        this.getGameByUserId(createGameDto.userId);
+      }
+      const userGame = createGameDto.userId ? await this.getGameByUserId(createGameDto.userId) : null;
+
+      return userGame;
     });
   }
 
@@ -77,15 +80,80 @@ export class GamesService {
     return `This action returns all games`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} game`;
+  getGameByUserId(userId: string) {
+    return this.gameRepository
+      .createQueryBuilder('g')
+      .innerJoin('g.gamePlayers', 'gp')
+      .select(['g', 'gp'])
+      .where('gp.userId = :userId', { userId })
+      .andWhere('g.status = :status', {
+        status: GameStatus.CREATED,
+      })
+      .andWhere('gp.isActive = :isActive', {
+        isActive: true,
+      })
+      .andWhere('gp.result = :result', {
+        result: PlayerResult.UNKNOWN,
+      })
+      .getOne();
+  }
+  getGameByUuid(uuid: string) {
+    return this.gameRepository
+      .createQueryBuilder('g')
+      .innerJoin('g.gamePlayers', 'gp')
+      .select(['g', 'gp'])
+      .where('g.uuid = :uuid', { uuid })
+      .andWhere('g.status = :status', {
+        status: GameStatus.CREATED,
+      })
+      .andWhere('gp.isActive = :isActive', {
+        isActive: true,
+      })
+      .andWhere('gp.result = :result', {
+        result: PlayerResult.UNKNOWN,
+      })
+      .getOne();
   }
 
-  update(id: number, updateGameDto: UpdateGameDto) {
-    return `This action updates a #${id} game`;
-  }
+  // we will need server side move validation and game state management here, but for now let's just consider from front end
+  // here we would validate the move, update the game state, determine if the game is over, etc.
+  // for simplicity, let's just increment the moves count and return the game state
+  // send move and fen both and then calculate
+  async move(uuid: string, moveDto: MoveDto) {
+    return await this.dataSource.transaction(async manager => {
 
-  remove(id: number) {
-    return `This action removes a #${id} game`;
+      const gameRepo = manager.getRepository(Game);
+      // lock the game row to prevent concurrent moves
+      const game = await gameRepo
+        .createQueryBuilder('g')
+        .setLock('pessimistic_write')
+        .where('g.uuid = :uuid', { uuid })
+        .getOne();
+
+      if (!game) {
+        throw new Error('Game not found');
+      }
+
+      const chess = new Chess(game.currentFen || undefined);
+      // validate the move
+      const result = chess.move({
+        from: moveDto.from,
+        to: moveDto.to,
+        promotion: moveDto.promotion,
+      });
+
+      if (!result) {
+        throw new Error('Invalid move');
+      }
+
+      game.movesCount += 1;
+      game.currentFen = chess.fen();
+
+      await gameRepo.save(game);
+
+      return await gameRepo.findOne({
+        where: { uuid },
+      });
+    });
   }
 }
