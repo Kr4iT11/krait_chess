@@ -27,8 +27,8 @@ export class GamesController {
     return this.gamesService.create(createGameDto);
   }
   @Patch('move/:uuid')
-  async move(@Param('uuid') uuid: string, @Body() moveDto: MoveDto) {
+  async move(@Request() req, @Param('uuid') uuid: string, @Body() moveDto: MoveDto) {
     console.warn('moveDto', moveDto);
-    return this.gamesService.move(uuid, moveDto);
+    return this.gamesService.move(uuid, req.user.id.toString(), moveDto);
   }
 }
